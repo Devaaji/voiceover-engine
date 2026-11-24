@@ -1,0 +1,26 @@
+# Secrets: copy .env.example to .env
+.env
+.env.*
+!.env.example
+
+# Job results (a volume on Railway)
+/data/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+*.tsbuildinfo
+.vercel
+
+# Misc
+.DS_Store
+*.pem
+npm-debug.log*

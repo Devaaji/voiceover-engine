@@ -1,0 +1,6 @@
+# The same line endings on every machine: the Docker image and Railway run on Linux.
+* text=auto eol=lf
+*.mp3 binary
+*.wav binary
+*.png binary
+*.ico binary

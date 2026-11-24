@@ -1,0 +1,44 @@
+{
+  "types": {
+    "steady": {
+      "label": "Steady",
+      "note": "A calm delivery at an even volume.",
+      "style": "consistent",
+      "narration": "plain",
+      "leveler": { "strength": 0.5, "max_change_db": 3, "window_ms": 2500, "smooth_ms": 800 }
+    },
+    "lively": {
+      "label": "Lively",
+      "note": "More energy and emphasis. The script is worded to be performed, not read.",
+      "style": "energetic",
+      "narration": "spoken",
+      "leveler": { "strength": 0.5, "max_change_db": 3, "window_ms": 2500, "smooth_ms": 800 }
+    },
+    "teacher": {
+      "label": "Like the teacher",
+      "note": "Written and spoken the way the teacher talks in his own videos. Since 2026-11-22 spoken livelier and faster (stability 0.22, style 0.55, speed 1.2, ElevenLabs' fastest natural speed): measured on a clip of his own talk, it is the closest to his pace and intonation of eight versions (outputs/voice-style-trial, version G); before, 0.4/0.75/0/1.0 sounded flat and slow.",
+      "style": "teacher",
+      "narration": "teacher",
+      "leveler": { "strength": 0.5, "max_change_db": 3, "window_ms": 2500, "smooth_ms": 800 }
+    }
+  },
+  "styles": {
+    "consistent": { "stability": 0.5, "similarity_boost": 0.75, "style": 0.0, "use_speaker_boost": true, "speed": 1.0 },
+    "natural": { "stability": 0.4, "similarity_boost": 0.8, "style": 0.2, "use_speaker_boost": true, "speed": 1.0 },
+    "expressive": { "stability": 0.3, "similarity_boost": 0.8, "style": 0.45, "use_speaker_boost": true, "speed": 1.0 },
+    "energetic": { "stability": 0.22, "similarity_boost": 0.85, "style": 0.65, "use_speaker_boost": true, "speed": 1.05 },
+    "teacher": { "stability": 0.22, "similarity_boost": 0.85, "style": 0.55, "use_speaker_boost": true, "speed": 1.2 }
+  },
+  "leveler": {
+    "point_ms": 250,
+    "frame_ms": 50,
+    "gate_db": 15,
+    "ignore_below_db": 12,
+    "limiter_headroom_db": 1.0,
+    "floor_db": -60,
+    "quiet_below_db": 30,
+    "min_quiet_ms": 200,
+    "floor_ramp_ms": 80,
+    "max_floor_cut_db": 24
+  }
+}

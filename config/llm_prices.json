@@ -1,0 +1,11 @@
+{
+  "_comment": "US dollars per million tokens. cache_read and cache_write are optional: they default to 0.1x and 1.25x of the input price.",
+  "claude-sonnet-5-5": { "input": 2.0, "output": 10.0, "cache_read": 0.2 },
+  "claude-sonnet-5": { "input": 2.0, "output": 10.0 },
+  "claude-opus-5-5": { "input": 4.0, "output": 20.0, "cache_read": 0.2 },
+  "claude-haiku-4-5": { "input": 1.0, "output": 5.0 },
+  "_deepseek": "DeepSeek peak-hour prices (off-peak is half). Its cache needs no write, so cache_write is 0.",
+  "deepseek-flash": { "input": 0.3, "output": 1.2, "cache_read": 0.006, "cache_write": 0 },
+  "deepseek-v4-flash": { "input": 0.3, "output": 1.2, "cache_read": 0.006, "cache_write": 0 },
+  "deepseek-v4-pro": { "input": 1.32, "output": 3.96, "cache_read": 0.044, "cache_write": 0 }
+}
