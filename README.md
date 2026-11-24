@@ -45,20 +45,36 @@ Dockerfile          the backend with FFmpeg, for Railway
 
 ## Setup
 
-You need Python 3.13, Node.js 20 or newer, and FFmpeg (`ffmpeg` and `ffprobe` on the PATH).
+You need Python 3.10 or newer (3.13 recommended), Node.js 20 or newer, and **FFmpeg 9 or newer** (`ffmpeg` and
+`ffprobe` on the PATH). Older FFmpeg cuts the audio short where a pause is filled with room tone (FFmpeg 6.1, Ubuntu
+24.04's own, made 1.7 s of a 10 s segment), so the installer and every job refuse it.
+
+On macOS (Terminal) and Linux, and on Windows from Git Bash:
 
 ```bash
-cp .env.example .env          # then fill in API_KEY, ELEVENLABS_API_KEY and, for rewrite, ANTHROPIC_API_KEY
+bash install.sh      # checks Python, Node.js and FFmpeg and offers to install what is missing
+                     # (macOS: Homebrew, Windows: winget), then the backend and frontend packages and .env
+bash start.sh        # the API on http://localhost:8000 and the test page on http://localhost:3000
+```
 
-cd backend
-python -m venv .venv
-.venv/Scripts/python -m pip install -r requirements-dev.txt     # macOS/Linux: .venv/bin/python
-.venv/Scripts/python -m uvicorn main:app --port 8000
+- `install.sh` is safe to run again: it only does what is missing. `--yes` installs missing tools without asking.
+  The first run makes `.env` from `.env.example` with a random `API_KEY`; fill in `ELEVENLABS_API_KEY` (and
+  `ANTHROPIC_API_KEY` for `"rewrite": true`).
+- On a Mac without Homebrew, install it first (https://brew.sh), open a new terminal, and run `bash install.sh` again.
+  On Linux, apt's FFmpeg is usually too old: put a static FFmpeg 9.x build on the PATH, or use the Docker image.
+- `start.sh` runs both and stops both on Ctrl+C. Other ports: `BACKEND_PORT=8100 FRONTEND_PORT=3100 bash start.sh`, or
+  set `BACKEND_PORT` and `FRONTEND_PORT` in `.env`. It points the test page at the backend and lets that page call it
+  (CORS) by itself. `bash start.sh --dev` restarts the backend when its code changes (not on Windows).
+- Open the test page, paste the `API_KEY` from `.env`, paste a script, and press Generate.
 
-cd ../frontend
-cp .env.example .env.local    # NEXT_PUBLIC_API_URL=http://localhost:8000
-npm install
-npm run dev                   # http://localhost:3000, paste the API_KEY into the page
+By hand, without the scripts:
+
+```bash
+cp .env.example .env                                            # fill in the keys
+cd backend && python -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt         # Windows: .venv/Scripts/python
+.venv/bin/python -m uvicorn main:app --port 8000
+cd ../frontend && cp .env.example .env.local && npm install && npm run dev
 ```
 
 ## Environment variables
@@ -87,6 +103,7 @@ All of them go in `.env` at the project root (or in the host's variables). See `
 | `COST_LIMIT_USD` | `5` | The most one job may spend on Claude. |
 | `DATA_DIR` | `data` | Where jobs' files go. Mount a volume here on Railway. |
 | `MAX_CONCURRENT_JOBS` | `1` | How many jobs make their voice at the same time. |
+| `BACKEND_PORT`, `FRONTEND_PORT` | `8000`, `3000` | The ports `start.sh` runs on (local only; Railway sets `PORT`). |
 
 ## API
 
@@ -244,7 +261,8 @@ OLD_REPO=D:/1_FREELANCE/automation-video-tools .venv/Scripts/python -m pytest   
   explanations, a section, with `[pause]` holds). This engine makes their audio again from the same voice, with no call
   to ElevenLabs, and the result must be byte-identical to what the old pipeline made: the pauses, the room tone, the
   levelling, the padding. Byte comparison needs the FFmpeg build the fixtures were made with (9.0.2); with another
-  build only the numbers are compared. Rebuild fixtures with `tests/golden/build_fixtures.py`.
+  9.x build the numbers (pause places, room tone, levelling) are still compared. FFmpeg older than 9 is not supported.
+  Rebuild fixtures with `tests/golden/build_fixtures.py`.
 - **Parity** (`tests/parity`, only with `OLD_REPO`): the old repo's own code, run in its own Python, and the copy here
   answer the same cases the same way (pronunciations, pauses, room tone, leveler filters, the ElevenLabs request, the
   teacher-style pass, subtitles).

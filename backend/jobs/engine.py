@@ -6,6 +6,7 @@ from typing import Callable
 from jobs.models import VoiceoverRequest
 from voiceover.core import config
 from voiceover.core.exceptions import AppError
+from voiceover import ffmpeg_version
 from voiceover.core.paths import JobPaths
 from voiceover.pipeline import assemble, transcript, voice
 from voiceover.pipeline.context import StepContext
@@ -42,6 +43,8 @@ def run(job_id: str, request: VoiceoverRequest, update: Update) -> None:
         raise AppError('Mode "content" is not available yet. Send a finished script with mode "script".')
 
     ffmpeg.require()
+    # An FFmpeg too old for the pipeline's filters fails here, before anything is spent.
+    ffmpeg_version.check()
     choice = VoiceChoice.from_env(request.voiceType or "")
     voice_config.get(choice.voice_type)  # an unknown voice type fails here, before anything is spent
     update(voice=choice.public())

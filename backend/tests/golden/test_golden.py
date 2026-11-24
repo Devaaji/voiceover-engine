@@ -5,7 +5,7 @@ returned, and the SHA-256 of what the old pipeline made from it. Here the same v
 no call to ElevenLabs: the holds and room tone (pipeline/voice.py), then the levelling and the padding
 (pipeline/assemble.py). The holds' places and the levelling's measurements must be equal; the audio files must be
 byte-identical when FFmpeg is the build the fixtures were made with (the bytes of an encoder can change between
-builds; the numbers do not).
+builds). FFmpeg older than 9 is not supported (voiceover/ffmpeg_version.py): 6.1 cuts the audio short.
 """
 
 import hashlib
