@@ -49,6 +49,14 @@ def test_cors_lets_the_test_page_send_the_key(client: TestClient) -> None:
     assert preflight.headers["access-control-allow-origin"] == "http://localhost:3000"
 
 
+def test_the_voice_type_from_env_is_marked_as_the_default(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    types = client.get("/voice-types", headers=KEY).json()
+    assert [voice_type["id"] for voice_type in types if voice_type["default"]] == ["teacher"]
+    monkeypatch.setattr(config, "VOICE_TYPE", "steady")
+    types = client.get("/voice-types", headers=KEY).json()
+    assert [voice_type["id"] for voice_type in types if voice_type["default"]] == ["steady"]
+
+
 def test_bad_requests_are_explained(client: TestClient) -> None:
     assert client.post("/voiceover", headers=KEY, json={"mode": "script"}).status_code == 422
     assert client.post("/voiceover", headers=KEY, json={"script": "Hi.", "voiceType": "nope"}).status_code == 400

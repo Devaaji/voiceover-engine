@@ -63,9 +63,10 @@ bash start.sh        # the API on http://localhost:8000 and the test page on htt
 - On a Mac without Homebrew, install it first (https://brew.sh), open a new terminal, and run `bash install.sh` again.
   On Linux, apt's FFmpeg is usually too old: put a static FFmpeg 9.x build on the PATH, or use the Docker image.
 - `start.sh` runs both and stops both on Ctrl+C. Other ports: `BACKEND_PORT=8100 FRONTEND_PORT=3100 bash start.sh`, or
-  set `BACKEND_PORT` and `FRONTEND_PORT` in `.env`. It points the test page at the backend and lets that page call it
-  (CORS) by itself. `bash start.sh --dev` restarts the backend when its code changes (not on Windows).
-- Open the test page, paste the `API_KEY` from `.env`, paste a script, and press Generate.
+  set `BACKEND_PORT` and `FRONTEND_PORT` in `.env`. It gives the test page the backend's URL and the `API_KEY` from
+  `.env`, which stays on the page's server (`frontend/app/api`). `bash start.sh --dev` restarts the backend when its
+  code changes (not on Windows).
+- Open the test page, paste a script, and press Generate. The voice, the voice type and the rest come from `.env`.
 
 By hand, without the scripts:
 
@@ -74,7 +75,7 @@ cp .env.example .env                                            # fill in the ke
 cd backend && python -m venv .venv
 .venv/bin/python -m pip install -r requirements-dev.txt         # Windows: .venv/Scripts/python
 .venv/bin/python -m uvicorn main:app --port 8000
-cd ../frontend && cp .env.example .env.local && npm install && npm run dev
+cd ../frontend && cp .env.example .env.local && npm install && npm run dev   # API_KEY in .env.local too
 ```
 
 ## Environment variables
@@ -84,7 +85,7 @@ All of them go in `.env` at the project root (or in the host's variables). See `
 | Name | Default | What it does |
 |---|---|---|
 | `API_KEY` | (none) | Required. Every request must send it in the `X-API-Key` header; without it set, every request is refused. |
-| `CORS_ORIGINS` | `http://localhost:3000` | Sites that may call the API from a browser, comma separated. |
+| `CORS_ORIGINS` | `http://localhost:3000` | Sites that may call the API from a browser, comma separated (the test page calls it from its server, so it does not need this). |
 | `API_DOCS` | `off` | `on` serves FastAPI's `/docs`, which needs no key. Local development only. |
 | `ELEVENLABS_API_KEY` | (none) | Required for the voice. |
 | `ELEVENLABS_VOICE_ID` | `rExOvxZPbTNhO480h6cK` | The voice. **It must exist in the ElevenLabs account that owns `ELEVENLABS_API_KEY`**: a voice clone made in that account, or a voice added to its library. A voice of another account returns an error. |
@@ -212,7 +213,15 @@ by its length because the voice's times could not be followed there):
 
 ### GET /voice-types
 
-The voice types of `config/voice.json`, for `voiceType`.
+The voice types of `config/voice.json`, for `voiceType`. `default` is `true` on the one `VOICE_TYPE` picks: a
+request without `voiceType` is made with it.
+
+```json
+[
+  { "id": "steady", "label": "Steady", "note": "A calm delivery at an even volume.", "default": false },
+  { "id": "teacher", "label": "Like the teacher", "note": "...", "default": true }
+]
+```
 
 ### Errors
 
@@ -273,11 +282,12 @@ OLD_REPO=D:/1_FREELANCE/automation-video-tools .venv/Scripts/python -m pytest   
 
 1. Create a service from this repository; Railway builds the `Dockerfile` (Python 3.13 and FFmpeg 9.0.2).
 2. Add a volume mounted at `/data` (job files survive a redeploy).
-3. Set the variables: `API_KEY`, `ELEVENLABS_API_KEY`, `ANTHROPIC_API_KEY` (for rewrite), `CORS_ORIGINS` (the test
-   page's URL), and any other from the table. `PORT` is set by Railway.
+3. Set the variables: `API_KEY`, `ELEVENLABS_API_KEY`, `ANTHROPIC_API_KEY` (for rewrite), and any other from the
+   table. `PORT` is set by Railway.
 4. Keep one replica: jobs run in the service's own background threads.
-5. The test page (`frontend/`) is deployed on its own (Vercel, or a second Railway service) with
-   `NEXT_PUBLIC_API_URL` set to the backend's URL. It asks for the API key in the page and keeps it in that browser.
+5. The test page (`frontend/`) is deployed on its own (Vercel, or a second Railway service) with `API_URL` (the
+   backend's URL) and `API_KEY`. Its server sends the key, so whoever can open the page can make voiceovers on your
+   ElevenLabs and Claude accounts: keep its URL private or put it behind the host's password protection.
 
 ## Where the code comes from
 

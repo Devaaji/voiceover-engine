@@ -92,7 +92,7 @@ COST_LIMIT_USD = float(_env("COST_LIMIT_USD") or DEFAULT_MAX_JOB_COST_USD)
 
 # Every request must send it as the X-API-Key header. The API refuses every request while it is not set.
 API_KEY = _env("API_KEY")
-# The sites that may call the API from a browser (the test page), comma separated.
+# The sites that may call the API from a browser, comma separated (the test page calls it from its own server).
 CORS_ORIGINS = [origin.strip().rstrip("/") for origin in (_env("CORS_ORIGINS") or "http://localhost:3000").split(",") if origin.strip()]
 # FastAPI's /docs and /openapi.json, which need no key: on only when "on" (local development).
 API_DOCS = _env("API_DOCS").lower() == "on"

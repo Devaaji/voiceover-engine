@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse
 from api.security import require_api_key
 from jobs import runner, store
 from jobs.models import Job, VoiceoverRequest
+from voiceover.core import config
 from voiceover.core.exceptions import AppError, NotFound
 from voiceover.core.paths import JobPaths
 from voiceover.services import voice_config
@@ -60,5 +61,6 @@ def get_voiceover_file(job_id: str, name: str) -> FileResponse:
 
 @router.get("/voice-types")
 def voice_types() -> list[dict]:
-    """The voice types of config/voice.json, for a request's voiceType."""
-    return [choice.model_dump() for choice in voice_config.choices()]
+    """The voice types of config/voice.json, for a request's voiceType. `default` marks the one VOICE_TYPE in .env
+    picks, the one a request without voiceType is made with."""
+    return [{**choice.model_dump(), "default": choice.id == config.VOICE_TYPE} for choice in voice_config.choices()]

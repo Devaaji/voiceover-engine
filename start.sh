@@ -60,14 +60,10 @@ for port in "$BACKEND_PORT" "$FRONTEND_PORT"; do
   fi
 done
 
-# The test page calls this backend, and the backend lets this page call it.
-export NEXT_PUBLIC_API_URL="http://localhost:$BACKEND_PORT"
-CORS="${CORS_ORIGINS:-$(from_env_file CORS_ORIGINS)}"
-case ",$CORS," in
-  *",http://localhost:$FRONTEND_PORT,"*) ;;
-  *) CORS="${CORS:+$CORS,}http://localhost:$FRONTEND_PORT" ;;
-esac
-export CORS_ORIGINS="$CORS"
+# The test page's server calls this backend with API_KEY from .env (frontend/app/api), so the page asks for no key.
+export API_URL="http://localhost:$BACKEND_PORT"
+API_KEY="${API_KEY:-$(from_env_file API_KEY)}"
+export API_KEY
 
 # --- Run both, stop both on Ctrl+C ------------------------------------------
 
